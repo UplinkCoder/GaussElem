@@ -39,5 +39,4 @@ void main() {
       }
   }
 
-   writeln(mat);
 } 
