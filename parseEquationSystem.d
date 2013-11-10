@@ -54,6 +54,7 @@ void main() {
   // HERE ROW PARSING ENDS
 }
 
+<<<<<<< HEAD
 Pair[] parseRow (ParseTree Input) {
   Pair[] PairStack;
   foreach (ref child;Input.children[0].children) {
@@ -71,3 +72,6 @@ Pair[] parseRow (ParseTree Input) {
     }
     return (sort!("a.chr<b.chr")(PairStack)).release;
 }
+=======
+} 
+>>>>>>> e5e2157a94276de52e0f613ded3fb9712b93ede6
