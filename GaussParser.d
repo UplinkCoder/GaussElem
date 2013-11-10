@@ -4,16 +4,16 @@ This module was automatically generated from the following grammar:
 
     GaussGrammar:
 
-    Formula  <- ('+'? LeftSideElement)+ '=' RightSideElement
+    Formula  <  (:'+'? LeftSideElement)+ '=' RightSideElement
     
-    LeftSideElement <-  Number Letter / Minus? Letter
+   
+    LeftSideElement <- Number Letter /
+                       ~(Minus? Letter) 
     RightSideElement <- Number
    
-    Plus      <- '+'
     Minus     <- '-'     
-    Equals <- '='
     
-    Number <- Minus? ~Digit+
+    Number <~ Minus? ~Digit+ 
     Digit   <- [0-9]
     Letter <- [a-z]
 
@@ -40,9 +40,7 @@ struct GenericGaussGrammar(TParseTree)
         rules["Formula"] = toDelegate(&GaussGrammar.Formula);
         rules["LeftSideElement"] = toDelegate(&GaussGrammar.LeftSideElement);
         rules["RightSideElement"] = toDelegate(&GaussGrammar.RightSideElement);
-        rules["Plus"] = toDelegate(&GaussGrammar.Plus);
         rules["Minus"] = toDelegate(&GaussGrammar.Minus);
-        rules["Equals"] = toDelegate(&GaussGrammar.Equals);
         rules["Number"] = toDelegate(&GaussGrammar.Number);
         rules["Digit"] = toDelegate(&GaussGrammar.Digit);
         rules["Letter"] = toDelegate(&GaussGrammar.Letter);
@@ -111,7 +109,7 @@ struct GenericGaussGrammar(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.and!(pegged.peg.option!(pegged.peg.literal!("+")), LeftSideElement)), pegged.peg.literal!("="), RightSideElement), "GaussGrammar.Formula")(p);
+            return         pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.wrapAround!(Spacing, pegged.peg.and!(pegged.peg.discard!(pegged.peg.option!(pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("+"), Spacing))), pegged.peg.wrapAround!(Spacing, LeftSideElement, Spacing)), Spacing)), pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("="), Spacing), pegged.peg.wrapAround!(Spacing, RightSideElement, Spacing)), "GaussGrammar.Formula")(p);
         }
         else
         {
@@ -119,7 +117,7 @@ struct GenericGaussGrammar(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.and!(pegged.peg.option!(pegged.peg.literal!("+")), LeftSideElement)), pegged.peg.literal!("="), RightSideElement), "GaussGrammar.Formula"), "Formula")(p);
+                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.wrapAround!(Spacing, pegged.peg.and!(pegged.peg.discard!(pegged.peg.option!(pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("+"), Spacing))), pegged.peg.wrapAround!(Spacing, LeftSideElement, Spacing)), Spacing)), pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("="), Spacing), pegged.peg.wrapAround!(Spacing, RightSideElement, Spacing)), "GaussGrammar.Formula"), "Formula")(p);
                 memo[tuple(`Formula`,p.end)] = result;
                 return result;
             }
@@ -130,12 +128,12 @@ struct GenericGaussGrammar(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.and!(pegged.peg.option!(pegged.peg.literal!("+")), LeftSideElement)), pegged.peg.literal!("="), RightSideElement), "GaussGrammar.Formula")(TParseTree("", false,[], s));
+            return         pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.wrapAround!(Spacing, pegged.peg.and!(pegged.peg.discard!(pegged.peg.option!(pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("+"), Spacing))), pegged.peg.wrapAround!(Spacing, LeftSideElement, Spacing)), Spacing)), pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("="), Spacing), pegged.peg.wrapAround!(Spacing, RightSideElement, Spacing)), "GaussGrammar.Formula")(TParseTree("", false,[], s));
         }
         else
         {
             memo = null;
-            return hooked!(pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.and!(pegged.peg.option!(pegged.peg.literal!("+")), LeftSideElement)), pegged.peg.literal!("="), RightSideElement), "GaussGrammar.Formula"), "Formula")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.named!(pegged.peg.and!(pegged.peg.oneOrMore!(pegged.peg.wrapAround!(Spacing, pegged.peg.and!(pegged.peg.discard!(pegged.peg.option!(pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("+"), Spacing))), pegged.peg.wrapAround!(Spacing, LeftSideElement, Spacing)), Spacing)), pegged.peg.wrapAround!(Spacing, pegged.peg.literal!("="), Spacing), pegged.peg.wrapAround!(Spacing, RightSideElement, Spacing)), "GaussGrammar.Formula"), "Formula")(TParseTree("", false,[], s));
         }
     }
     static string Formula(GetName g)
@@ -147,7 +145,7 @@ struct GenericGaussGrammar(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.and!(pegged.peg.option!(Minus), Letter)), "GaussGrammar.LeftSideElement")(p);
+            return         pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), Letter))), "GaussGrammar.LeftSideElement")(p);
         }
         else
         {
@@ -155,7 +153,7 @@ struct GenericGaussGrammar(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.and!(pegged.peg.option!(Minus), Letter)), "GaussGrammar.LeftSideElement"), "LeftSideElement")(p);
+                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), Letter))), "GaussGrammar.LeftSideElement"), "LeftSideElement")(p);
                 memo[tuple(`LeftSideElement`,p.end)] = result;
                 return result;
             }
@@ -166,12 +164,12 @@ struct GenericGaussGrammar(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.and!(pegged.peg.option!(Minus), Letter)), "GaussGrammar.LeftSideElement")(TParseTree("", false,[], s));
+            return         pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), Letter))), "GaussGrammar.LeftSideElement")(TParseTree("", false,[], s));
         }
         else
         {
             memo = null;
-            return hooked!(pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.and!(pegged.peg.option!(Minus), Letter)), "GaussGrammar.LeftSideElement"), "LeftSideElement")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.named!(pegged.peg.or!(pegged.peg.and!(Number, Letter), pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), Letter))), "GaussGrammar.LeftSideElement"), "LeftSideElement")(TParseTree("", false,[], s));
         }
     }
     static string LeftSideElement(GetName g)
@@ -215,42 +213,6 @@ struct GenericGaussGrammar(TParseTree)
         return "GaussGrammar.RightSideElement";
     }
 
-    static TParseTree Plus(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.named!(pegged.peg.literal!("+"), "GaussGrammar.Plus")(p);
-        }
-        else
-        {
-            if(auto m = tuple(`Plus`,p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.literal!("+"), "GaussGrammar.Plus"), "Plus")(p);
-                memo[tuple(`Plus`,p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree Plus(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.named!(pegged.peg.literal!("+"), "GaussGrammar.Plus")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            memo = null;
-            return hooked!(pegged.peg.named!(pegged.peg.literal!("+"), "GaussGrammar.Plus"), "Plus")(TParseTree("", false,[], s));
-        }
-    }
-    static string Plus(GetName g)
-    {
-        return "GaussGrammar.Plus";
-    }
-
     static TParseTree Minus(TParseTree p)
     {
         if(__ctfe)
@@ -287,47 +249,11 @@ struct GenericGaussGrammar(TParseTree)
         return "GaussGrammar.Minus";
     }
 
-    static TParseTree Equals(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.named!(pegged.peg.literal!("="), "GaussGrammar.Equals")(p);
-        }
-        else
-        {
-            if(auto m = tuple(`Equals`,p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.literal!("="), "GaussGrammar.Equals"), "Equals")(p);
-                memo[tuple(`Equals`,p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree Equals(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.named!(pegged.peg.literal!("="), "GaussGrammar.Equals")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            memo = null;
-            return hooked!(pegged.peg.named!(pegged.peg.literal!("="), "GaussGrammar.Equals"), "Equals")(TParseTree("", false,[], s));
-        }
-    }
-    static string Equals(GetName g)
-    {
-        return "GaussGrammar.Equals";
-    }
-
     static TParseTree Number(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.named!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit))), "GaussGrammar.Number")(p);
+            return         pegged.peg.named!(pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit)))), "GaussGrammar.Number")(p);
         }
         else
         {
@@ -335,7 +261,7 @@ struct GenericGaussGrammar(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit))), "GaussGrammar.Number"), "Number")(p);
+                TParseTree result = hooked!(pegged.peg.named!(pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit)))), "GaussGrammar.Number"), "Number")(p);
                 memo[tuple(`Number`,p.end)] = result;
                 return result;
             }
@@ -346,12 +272,12 @@ struct GenericGaussGrammar(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.named!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit))), "GaussGrammar.Number")(TParseTree("", false,[], s));
+            return         pegged.peg.named!(pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit)))), "GaussGrammar.Number")(TParseTree("", false,[], s));
         }
         else
         {
             memo = null;
-            return hooked!(pegged.peg.named!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit))), "GaussGrammar.Number"), "Number")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.named!(pegged.peg.fuse!(pegged.peg.and!(pegged.peg.option!(Minus), pegged.peg.fuse!(pegged.peg.oneOrMore!(Digit)))), "GaussGrammar.Number"), "Number")(TParseTree("", false,[], s));
         }
     }
     static string Number(GetName g)
