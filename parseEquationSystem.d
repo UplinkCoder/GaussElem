@@ -6,7 +6,7 @@
 // will make use of pegged right now
 import pegged.grammar;
 //import GaussParser;
-import std.stdio,std.numeric,std.algorithm;
+import std.stdio,std.numeric,std.algorithm,std.exception;
 
 enum GGstring = `
     GaussGrammar:
@@ -35,18 +35,41 @@ void main() {
   //pegged.grammar.asModule("GaussParser","src/GausParser",GGstring);
   // I need to transform a LeftSideElement into a pair
   // [char Identifier,int Number]
+  Pair[][] Rows;
   foreach (line;stdin.byLine) {
       ParseTree Input =GaussGrammar(cast(string)line);
       Pair[] row=parseRow(Input);
-      writeln(row);
-      //checkRow(row)
-      
+      if(checkRowForDuplicats(row))
+      Rows ~= row;
   }
-  
+ writeln(Rows); 
   
    
 }
+void insertPadding(Pair[] RowA,Pair[] RowB) {
+	/*
+	 * First take the largest Array in the System
+	 * then compare it to the second largest for
+	 * missing Variables
+	 * insert Padding i.a. Pair(0,missingChr)
+	 */
+	
+	for(int i=0;i<max(RowA.length,RowB.length);i++) {
+	//if (RowA[i].chr<RowB[i].chr) 
+	}
+}
+bool checkRowForDuplicats (Pair[] Row){
+	// check for duplicate Identifier
+	// because it is already sorted i just need to compare
+	// in order
+	for(int i=0;i<Row.length-1;i++) {
+		if((Row[i].chr)==(Row[i+1].chr)) return false;
+	}
+	return true;
+}
 
+
+	
 
 Pair[] parseRow (ParseTree Input) {
   Pair[] PairStack;
@@ -65,5 +88,3 @@ Pair[] parseRow (ParseTree Input) {
     }
     return (sort!("a.chr<b.chr")(PairStack)).release;
 }
-
- 
