@@ -5,7 +5,7 @@
 // a+b  = 6
 // will make use of pegged right now
 import pegged.grammar;
-//import GaussParser;
+import GaussParser;
 import std.stdio,std.numeric,std.algorithm,std.exception;
 
 enum GGstring = `
@@ -23,7 +23,7 @@ enum GGstring = `
     Digit   <- [0-9]
     Letter <- [a-z]
 `;
-mixin(grammar(GGstring));
+//mixin(grammar(GGstring));
 
  struct Pair {
       int val;
@@ -37,13 +37,15 @@ void main() {
   // [char Identifier,int Number]
   Pair[][] Rows;
   foreach (line;stdin.byLine) {
+  	  if (line=="") break;
       ParseTree Input =GaussGrammar(cast(string)line);
       Pair[] row=parseRow(Input);
-      if(checkRowForDuplicats(row))
+      writeln(row);
+      if(!checkRowForDuplicats(row))
+      writeln("How can you do that !?!");
       Rows ~= row;
   }
- writeln(Rows); 
-  
+  writeln("GoodBye!");
    
 }
 void insertPadding(Pair[] RowA,Pair[] RowB) {
@@ -74,7 +76,6 @@ bool checkRowForDuplicats (Pair[] Row){
 Pair[] parseRow (ParseTree Input) {
   Pair[] PairStack;
   foreach (ref child;Input.children[0].children) {
-      debug writeln(child);
       if (child.name=="GaussGrammar.LeftSideElement")
         if (child.matches.length == 2)
      PairStack ~= Pair(to!int(child.matches[0]),to!char(child.matches[1]));
