@@ -6,7 +6,7 @@
 // will make use of pegged right now
 import pegged.grammar;
 //import GaussParser;
-import std.stdio,std.numeric,std.algorithm,std.exception;
+import std.stdio,std.numeric,std.algorithm,std.exception,std.array;
 
 enum GGstring = `
     GaussGrammar:
@@ -35,17 +35,31 @@ void main() {
   //pegged.grammar.asModule("GaussParser","src/GausParser",GGstring);
   // I need to transform a LeftSideElement into a pair
   // [char Identifier,int Number]
-  Pair[][] Rows;
+  Pair[][] System;
   foreach (line;stdin.byLine) {
+	  if (line=="") break;
       ParseTree Input =GaussGrammar(cast(string)line);
       Pair[] row=parseRow(Input);
       if(checkRowForDuplicats(row))
-      Rows ~= row;
+      System ~= row;
   }
- writeln(Rows); 
+ writeln("All Variables in the System are: ",getAllVariables(System));
+ 
+ foreach(Row;System) writeln(Row); 
   
    
 }
+char[] getAllVariables (Pair[][] parsedSysten) {
+	char[] vars;
+	foreach (Row;parsedSysten) {
+		foreach (pair;Row) {
+			if(find(vars,pair.chr)==[])
+			vars ~= pair.chr;
+		}
+	}
+	return vars;
+}
+
 void insertPadding(Pair[] RowA,Pair[] RowB) {
 	/*
 	 * First take the largest Array in the System
