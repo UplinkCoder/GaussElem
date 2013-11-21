@@ -34,7 +34,7 @@ System getSystem(string[] input) {
       ParseTree Input =GaussGrammar(cast(string)line);
       Row row=parseRow(Input);
      Rows ~= row;
-      }
+  }
 return System(Rows); 
 }
 
@@ -63,6 +63,5 @@ private Row parseRow (ParseTree Input) {
     }
     if (!duplicatesInRow(vars)) 
     return Row(vars,res);
-    else
-    return null; 
+    throw (new Exception("There where duplicars in one row") );
 }

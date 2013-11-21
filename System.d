@@ -22,6 +22,7 @@ struct Row {
       int val;
       char chr;
   }
+  
   alias  map!("a.chr") chrmap;
   alias  map!("a.val") valmap;
 	 
@@ -31,7 +32,7 @@ struct Row {
 	
 
 	
-	
+	@disable this();
 	this(Pair[] pa,int result) {
 		writeln( map!("a.chr")(pa));
 		sort!("a.chr<b.chr")(pa); 
