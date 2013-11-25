@@ -9,14 +9,30 @@ struct AASystem {
     this (AARow[] aars) {
         rows = aars;
     }
+    string toString() {
+       
+        char[] vstring;
+        foreach (row;rows) {
+            alias row r;
+            foreach (i;0 .. r.vl.length) {
+                if (r.vl[r.vl.keys[i]]>0 && i!=0) vstring ~= '+';
+                vstring ~= to!string(r.vl[r.vl.keys[i]]) ~ r.vl.keys[i];
+            }
+            vstring ~= "=" ~ to!string(r.res) ~ "\n";
+        }
+        return cast(string)vstring;
+    }
+    
+    
 }
 
 
 struct AARow {
     alias int[char] aaType;
-    aaType val;
+    aaType vals;
+    alias vals vl;
     int res;
     this (aaType v,int r) {
-        val =v,res=r;
+        vals =v,res=r;
     }
 }

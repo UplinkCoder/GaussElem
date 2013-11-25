@@ -1,9 +1,3 @@
-/* Note I should propebly make use of pegged :D */
-
-// Input will come in following form : 
-// 2a+4b=-12
-// a+b  = 6
-// will make use of pegged right now
 import std.conv:to;
 import System:AASystem,AARow;
 import GaussParser;
