@@ -15,27 +15,28 @@ struct AASystem {
 	}
 
 	struct AARow {
-		double[char] vals;
+		double[char] scalars;
 		double res;
 		this (double[char] v,double r) {
 			foreach(key,val;v) {
-				vals[key]=val;
+				scalars[key]=val;
 			}
 			res=r;
 		}
 
+		bool isSolved() {return (singleVariable && scalars.values[0] == 1);}
 		
-		@property bool singleVariable() {return vals.length == 1;}
+		@property bool singleVariable() {return scalars.length == 1;}
 
 		bool hasVariables(char[] vars) {
 			foreach (v;vars)
-				if (!hasVariables(v))
+				if (!hasVariable(v))
 					return false;
 			return true;
 		}
 
-		bool hasVariables(char var) {
-			foreach(v;vals.byKey) {
+		bool hasVariable(char var) {
+			foreach(v;scalars.byKey) {
 				if (var == v) 
 					return true;
 			}
@@ -45,27 +46,23 @@ struct AASystem {
 		AARow applyTo(char op,double val) {
 			double res;
 			double[char] vals;
-			foreach (v;this.vals.byKey) {
-				mixin(ForOps!("vals[v] = this.vals[v]",/*~op~*/"val"
-				              ,
-				              "res = this.res",/*~op~*/"val")
-				      (['/','*'])
-				      );
+			foreach (v;scalars.byKey) {
+				mixin(ForOps!("vals[v] = this.scalars[v]",/*~op~*/"val",
+				              "res = this.res",/*~op~*/"val") (['/','*']));
 			}
 			return AARow(vals,res);
 		}
-
 	}
 
 	
 	AARow rows[];
-	Variable[char] vars; 
+	double[char] knwvars; 
 	
 	char[] allIdentifiers;
 
 	AARow[] getSingleVariableRows() {
 		AARow[] res;
-		foreach (r;rows) {
+		foreach (ref r;rows) {
 			if (r.singleVariable) {
 				res ~= r;
 			}
@@ -73,14 +70,7 @@ struct AASystem {
 		return res;
 	}
 
-	void addVars(char[] ids) {
-		foreach (id;ids) {
-			vars[id] = id;
-		}
-	}
-	ref Variable getVar (char id) {
-		return vars[id];
-	}
+	
 	AASystem applyTo(char op,double val) {
 		AARow[] aars;
 		foreach (r;rows) {
@@ -99,6 +89,15 @@ struct AASystem {
 		return res;
 	}
 
+	void reduceSingles() {
+		foreach (ref r;rows) {
+			if (r.singleVariable) {
+				r = r.applyTo('/',r.scalars.values[0]);
+				knwvars[r.scalars.keys[0]] = r.res;
+			}
+		}
+	}
+
 	this (AARow[] aars) {
 		rows = aars;
 	}
@@ -106,9 +105,9 @@ struct AASystem {
 	string toString() {
 		char[] vstring;
 		foreach (r;rows) {
-			foreach (i;0 .. r.vals.length) {
-				if (r.vals[r.vals.keys[i]]>0 && i!=0) vstring ~= '+';
-				vstring ~= to!string(r.vals[r.vals.keys[i]]) ~ r.vals.keys[i];
+			foreach (i;0 .. r.scalars.length) {
+				if (r.scalars[r.scalars.keys[i]]>0 && i!=0) vstring ~= '+';
+				vstring ~= to!string(r.scalars[r.scalars.keys[i]]) ~ r.scalars.keys[i];
 			}
 			vstring ~= "=" ~ to!string(r.res) ~ "\n";
 		}
@@ -117,5 +116,3 @@ struct AASystem {
 
 }
 alias Variable = AASystem.Variable;
-
-
