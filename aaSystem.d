@@ -1,4 +1,5 @@
 import std.algorithm;
+import std.array;
 import std.conv:to;
 import std.stdio;
 import forops;
@@ -44,16 +45,34 @@ struct AASystem {
 		}
 		
 		AARow applyTo(char op,double val) {
-			double res;
-			double[char] vals;
-			foreach (v;scalars.byKey) {
-				mixin(ForOps!("vals[v] = this.scalars[v]",/*~op~*/"val",
-				              "res = this.res",/*~op~*/"val") (['/','*']));
+			enum OPS = ['/','*'];
+			AARow ar;
+			foreach (k,v;scalars) {
+				mixin(ForOps!("ar.scalars[k] = v ",/*~op~*/" val",
+				              "ar.res = res ",/*~op~*/" val") (OPS));
 			}
-			return AARow(vals,res);
+			return ar;
 		}
-	}
 
+		AARow applyTo (char op,AARow r) {
+			enum OPS = ['+','-'];
+			AARow ar = this;
+			char[] vars = to!(char[])(setIntersection(scalars.keys,r.scalars.keys).array);
+			if (vars && r!is this) {
+				foreach(var;vars) {
+					mixin(ForOps!("ar.scalars[var] ","= r.scalars[var]")(OPS));
+				}
+				mixin (ForOps!("ar.res ","= r.res")(OPS));
+			}
+			return ar;
+		}
+
+		void removeZeroScalars() {
+			foreach (key;scalars.keys)
+				if (scalars[key]==0) scalars.remove(key);
+		}
+
+	}
 	
 	AARow rows[];
 	double[char] knwvars; 
@@ -79,23 +98,16 @@ struct AASystem {
 		return AASystem(aars);
 	}
 
-	AARow[] getRowsWith(char[] vars) {
-		AARow[] res;
-		foreach (r;rows) {
-			if (r.hasVariables(vars)) {
-				res ~= r;
-			}
-		}
-		return res;
-	}
-
-	void reduceSingles() {
+	
+	AASystem reduceSingles() {
 		foreach (ref r;rows) {
+			r.removeZeroScalars;
 			if (r.singleVariable) {
 				r = r.applyTo('/',r.scalars.values[0]);
 				knwvars[r.scalars.keys[0]] = r.res;
 			}
 		}
+		return this; 
 	}
 
 	this (AARow[] aars) {
@@ -106,8 +118,9 @@ struct AASystem {
 		char[] vstring;
 		foreach (r;rows) {
 			foreach (i;0 .. r.scalars.length) {
-				if (r.scalars[r.scalars.keys[i]]>0 && i!=0) vstring ~= '+';
-				vstring ~= to!string(r.scalars[r.scalars.keys[i]]) ~ r.scalars.keys[i];
+				if (r.scalars.values[i]>0 && i!=0) vstring ~= '+';
+				if (r.scalars.values[i]!=1) vstring ~= to!string(r.scalars.values[i]);
+				vstring ~= r.scalars.keys[i];
 			}
 			vstring ~= "=" ~ to!string(r.res) ~ "\n";
 		}
