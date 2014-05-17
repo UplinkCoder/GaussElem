@@ -4,16 +4,6 @@ import std.conv:to;
 import std.stdio;
 import forops;
 struct AASystem {
-	static struct Variable {
-		char chr;
-		double val;
-		@property hasValue() {return (val != double.init);}
-		
-		void opAssign(char c) {
-			this.chr = c;
-		}
-
-	}
 
 	struct AARow {
 		double[char] scalars;
@@ -25,8 +15,6 @@ struct AASystem {
 			res=r;
 		}
 
-		bool isSolved() {return (singleVariable && scalars.values[0] == 1);}
-		
 		@property bool singleVariable() {return scalars.length == 1;}
 
 		bool hasVariables(char[] vars) {
@@ -57,9 +45,8 @@ struct AASystem {
 		AARow applyTo (char op,AARow r) {
 			enum OPS = ['+','-'];
 			AARow ar = this;
-			char[] vars = to!(char[])(setIntersection(scalars.keys,r.scalars.keys).array);
-			if (vars && r!is this) {
-				foreach(var;vars) {
+			if (r!is this) {
+				foreach(var;r.scalars.keys) {
 					mixin(ForOps!("ar.scalars[var] ","= r.scalars[var]")(OPS));
 				}
 				mixin (ForOps!("ar.res ","= r.res")(OPS));
@@ -67,17 +54,15 @@ struct AASystem {
 			return ar;
 		}
 
-		void removeZeroScalars() {
-			foreach (key;scalars.keys)
-				if (scalars[key]==0) scalars.remove(key);
-		}
+		//		void removeZeroScalars() {
+		//			foreach (key;scalars.keys)
+		//				if (scalars[key]==0) scalars.remove(key);
+		//		}
 
 	}
 	
-	AARow rows[];
-	double[char] knwvars; 
-	
-	char[] allIdentifiers;
+	AARow[] rows;
+	double[char] kwnvars; 
 
 	AARow[] getSingleVariableRows() {
 		AARow[] res;
@@ -99,19 +84,9 @@ struct AASystem {
 	}
 
 	
-	AASystem reduceSingles() {
-		foreach (ref r;rows) {
-			r.removeZeroScalars;
-			if (r.singleVariable) {
-				r = r.applyTo('/',r.scalars.values[0]);
-				knwvars[r.scalars.keys[0]] = r.res;
-			}
-		}
-		return this; 
-	}
 
-	this (AARow[] aars) {
-		rows = aars;
+	this (AARow[] rs) {
+		rows = rs;
 	}
 
 	string toString() {
@@ -124,8 +99,8 @@ struct AASystem {
 			}
 			vstring ~= "=" ~ to!string(r.res) ~ "\n";
 		}
+		vstring ~= "KownVars :" ~ to!string(kwnvars); 
 		return cast(string)vstring;
 	}
 
 }
-alias Variable = AASystem.Variable;

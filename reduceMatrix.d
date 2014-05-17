@@ -1,41 +1,54 @@
 import aaSystem;
+import std.exception:enforce;
 import std.array:array;
-import std.algorithm:setIntersection;
-import std.conv:to;
+import std.algorithm:filter,remove,find,setIntersection,map;
 alias AASystem.AARow AARow;
 debug import std.stdio;
 
-AASystem reduceKownVariables(ref AASystem sys) {
-	sys.reduceSingles;
-	foreach (ref r;sys.rows) {
-		r = r.eliminateKnownVariables(sys.knwvars);
-	}
-	sys.reduceSingles;
-	return sys;
-}
 
-AASystem rowReducedSystem(AASystem sys) {
-	foreach (i; 0 .. sys.rows.length) {
-		foreach (j; i .. sys.rows.length) {
-			sys.rows[i] = sys.rows[i].applyTo('-',sys.rows[j]);
-		}
-	}
-	return sys;
-}
-
-
-
-AARow eliminateKnownVariables(AARow row, double[char] kwnvars) {
-	row.removeZeroScalars;
-	if (row.singleVariable) return row;
-	AARow res;
-	res.res = row.res;
-	foreach(var;row.scalars.keys) {
-		if(var !in kwnvars) {
-			res.scalars[var] = row.scalars[var];
+AASystem eliminateKnownVariables(AASystem sys) {
+	
+	//writeln(sys.rows);
+	bool hadtobreak  = false;
+	
+	// first reduce Everything without RowbyRow operations
+reset_foreach: 
+	foreach (i,ref row;sys.rows) {
+		if (!row.singleVariable) {
+			foreach(var;row.scalars.keys) {
+				if(var in sys.kwnvars) {
+					//					writeln("removeing Variable: ",var," in row ",i);
+					//					writeln("knvrs",sys.kwnvars);
+					row.res -= row.scalars[var]*sys.kwnvars[var];
+					row.scalars.remove(var);
+					goto reset_foreach;
+				}
+			}
 		} else {
-			res.res -= row.scalars[var]*kwnvars[var];
-		}
+			// eliminate if singleVariable
+			//			writeln("solving singleVariable ",row.scalars.keys[0]," in row ",i);
+			if (row.scalars.keys[0] in sys.kwnvars) {
+				writeln("something is wrong");
+				break;
+			} 
+			sys.kwnvars[row.scalars.keys[0]] = row.applyTo('/',row.scalars.values[0]).res;
+			sys.rows.remove(i);
+			sys.rows.length -= 1;
+			goto reset_foreach;
+		}  	
 	}
-	return res;
+	
+	// now we can try to reduce even more by subtracting rows form each other
+	if (sys.rows.length>1) {
+		foreach (row;sys.rows[1 .. $]) {
+			auto intr= cast(char[])setIntersection(sys.rows[0].scalars.keys,row.scalars.keys).array;
+			
+			sys.rows[0] = sys.rows[0].applyTo('-',row.applyTo('*',sys.rows[0].scalars[intr[0]] / row.scalars[intr[0]]));
+			sys.rows[0].writeln;
+			sys.rows[0].scalars.remove(intr[0]);
+			
+		}
+		goto reset_foreach;
+	}
+	return sys;
 }

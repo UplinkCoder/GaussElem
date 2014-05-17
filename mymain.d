@@ -7,12 +7,20 @@ import parseEquationSystem;
 import forops;
 
 void main(string[] args) {
+	//x = 1
+	//c = 5
+	//d = 10
+	//f = 12
+	//e = 2.5
+	
 	string[] testInput = [
-		"2x=10",
-		"2y-c-d=-13",
-		"4y+x+2c=81",
-		"2e+d=12",
-		"7d=49"
+		"2x=2",
+		"2y-c-d=-15",
+		"4y+x+2c=11",
+		"2e+d=15",
+		"f+d-8e=2",
+		"x+d=11",
+		"x-f-j=-22"
 		
 	];
 	string[] testInput2 = [
@@ -29,9 +37,9 @@ void main(string[] args) {
 	writeln("Initial System :");
 	writeln(testSystem);
 	writeln("Kown Variable Reduction (includes reduceSingle):");
-	testSystem.reduceKownVariables.writeln;
+	testSystem.eliminateKnownVariables.writeln;
 	writeln("After row reduction");
-	testSystem.rowReducedSystem.writeln;
+	//	testSystem.rowReducedSystem.writeln;
 	//	testSystem.rows[1] = testSystem.rows[1].applyTo('/',testSystem.rows[1].scalars.values[0]/testSystem.rows[2].scalars.values[0]);
 	//	testSystem.rows[1] = testSystem.rows[1].applyTo('-',testSystem.rows[2]);
 	//	testSystem.reduceSingles;
