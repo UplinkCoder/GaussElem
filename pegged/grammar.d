@@ -126,7 +126,7 @@ string grammar(Memoization withMemo = Memoization.yes)(string definition)
                 result =
 "struct Generic" ~ shortGrammarName ~ "(TParseTree)
 {
-    import pegged.dynamic.grammar;
+    //import pegged.dynamic.grammar;
     struct " ~ grammarName ~ "\n    {
     enum name = \"" ~ shortGrammarName ~ "\";
     static ParseTree delegate(ParseTree)[string] before;
@@ -179,7 +179,7 @@ string grammar(Memoization withMemo = Memoization.yes)(string definition)
             return hooked!(r, name)(ParseTree(\"\",false,[],input));
         }
     }
-
+/*
     static void addRuleBefore(string parentRule, string ruleSyntax)
     {
         // enum name is the current grammar name
@@ -201,7 +201,7 @@ string grammar(Memoization withMemo = Memoization.yes)(string definition)
         }
         after[parentRule] = rules[dg.startingRule];
     }
-
+*/
     static bool isRule(string s)
     {
         return s.startsWith(\"" ~ shortGrammarName ~ ".\");

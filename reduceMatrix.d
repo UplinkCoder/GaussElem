@@ -28,7 +28,7 @@ reset_foreach:
 			// eliminate if singleVariable
 			//			writeln("solving singleVariable ",row.scalars.keys[0]," in row ",i);
 			if (row.scalars.keys[0] in sys.kwnvars) {
-				writeln("something is wrong");
+				assert(0,"something is wrong");
 				break;
 			} 
 			sys.kwnvars[row.scalars.keys[0]] = row.applyTo('/',row.scalars.values[0]).res;
@@ -42,11 +42,10 @@ reset_foreach:
 	if (sys.rows.length>1) {
 		foreach (row;sys.rows[1 .. $]) {
 			auto intr= cast(char[])setIntersection(sys.rows[0].scalars.keys,row.scalars.keys).array;
-			
+			if (intr) {
 			sys.rows[0] = sys.rows[0].applyTo('-',row.applyTo('*',sys.rows[0].scalars[intr[0]] / row.scalars[intr[0]]));
-			sys.rows[0].writeln;
 			sys.rows[0].scalars.remove(intr[0]);
-			
+			}
 		}
 		goto reset_foreach;
 	}

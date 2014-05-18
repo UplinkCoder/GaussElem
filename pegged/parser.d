@@ -133,7 +133,7 @@ import std.functional: toDelegate;
 
 struct GenericPegged(TParseTree)
 {
-    import pegged.dynamic.grammar;
+    //import pegged.dynamic.grammar;
     struct Pegged
     {
     enum name = "Pegged";
@@ -220,7 +220,7 @@ struct GenericPegged(TParseTree)
             return hooked!(r, name)(ParseTree("",false,[],input));
         }
     }
-
+/*
     static void addRuleBefore(string parentRule, string ruleSyntax)
     {
         // enum name is the current grammar name
@@ -242,7 +242,7 @@ struct GenericPegged(TParseTree)
         }
         after[parentRule] = rules[dg.startingRule];
     }
-
+*/
     static bool isRule(string s)
     {
         return s.startsWith("Pegged.");
