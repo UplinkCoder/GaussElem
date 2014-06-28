@@ -7,6 +7,7 @@ struct AASystem {
 
 	struct AARow {
 		double[char] scalars;
+		alias scalars this;
 		double res;
 		this (double[char] v,double r) {
 			foreach(key,val;v) {
@@ -16,6 +17,10 @@ struct AASystem {
 		}
 
 		@property bool singleVariable() {return scalars.length == 1;}
+
+		@property char[] vars() {
+			return scalars.keys;
+		}
 
 		bool hasVariables(char[] vars) {
 			foreach (v;vars)
@@ -32,27 +37,35 @@ struct AASystem {
 			return false;
 		}
 		
-		AARow applyTo(char op,double val) {
-			enum OPS = ['/','*'];
-			AARow ar;
+		AARow opBinary (string op)(double val) if (op=="*"||op=="/") {
+			AARow ret;
 			foreach (k,v;scalars) {
-				mixin(ForOps!("ar.scalars[k] = v ",/*~op~*/" val",
-				              "ar.res = res ",/*~op~*/" val") (OPS));
+				mixin(q{ret[k] = v }~op~q{val;}
+				q{ret.res = res}~op~q{val;}) ;
 			}
-			return ar;
+			return ret;
 		}
 
-		AARow applyTo (char op,AARow r) {
-			enum OPS = ['+','-'];
-			AARow ar = this;
-			if (r!is this) {
-				foreach(var;r.scalars.keys) {
-					mixin(ForOps!("ar.scalars[var] ","= r.scalars[var]")(OPS));
-				}
-				mixin (ForOps!("ar.res ","= r.res")(OPS));
+		AARow opBinary (string op)(AARow rhs) if ((op=="+"||op=="-")&& rhs !is this) {
+			AARow ret = new AARow(this);
+			foreach (var;rhs.scalars.keys) {
+				mixin (q{ret[var] }~op~q{= rhs[var]});  
 			}
-			return ar;
+			mixin (q{ret.res }~op~q{= rhs.res});
+			return ret;
 		}
+
+//		AARow applyTo (char op,AARow r) {
+//			enum OPS = ['+','-'];
+//			AARow ar = this;
+//			if (r!is this) {
+//				foreach(var;r.scalars.keys) {
+//					mixin(ForOps!("ar.scalars[var] ","= r.scalars[var]")(OPS));
+//				}
+//				mixin (ForOps!("ar.res ","= r.res")(OPS));
+//			}
+//			return ar;
+//		}
 
 		//		void removeZeroScalars() {
 		//			foreach (key;scalars.keys)
@@ -74,14 +87,14 @@ struct AASystem {
 		return res;
 	}
 
-	
-	AASystem applyTo(char op,double val) {
+	/*
+	AASystem opBinary(string op) (char op,double val) {
 		AARow[] aars;
 		foreach (r;rows) {
 			aars ~=   r.applyTo(op,val);
 		}
 		return AASystem(aars);
-	}
+	}*/
 
 	
 

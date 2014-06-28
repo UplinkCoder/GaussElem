@@ -19,9 +19,14 @@ void main(string[] args) {
 	
 	writeln("Initial System :");
 	writeln(testSystem);
-	writeln("Kown Variable Reduction (includes reduceSingle):");
-	testSystem.eliminateKnownVariables.writeln;
-	writeln("After row reduction");
+	writeln("GCD applyed:");
+	writeln(testSystem.applyGCD);
+	writeln("LCM applyed");
+	writeln(testSystem.applyLCM);
+	//writeln("Kown Variable Reduction (includes reduceSingle):");
+	//testSystem.eliminateKnownVariables.writeln;
+	//writeln("After row reduction");
+
 	//	testSystem.rowReducedSystem.writeln;
 	//	testSystem.rows[1] = testSystem.rows[1].applyTo('/',testSystem.rows[1].scalars.values[0]/testSystem.rows[2].scalars.values[0]);
 	//	testSystem.rows[1] = testSystem.rows[1].applyTo('-',testSystem.rows[2]);
