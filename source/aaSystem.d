@@ -6,6 +6,13 @@ import forops;
 struct AASystem {
 
 	struct AARow {
+		struct Operation {
+			char operator;
+			union scalar_or_id {
+				double scalar;
+				uint id;
+			};
+		}
 		double[char] scalars;
 		alias scalars this;
 		double res;
@@ -16,27 +23,16 @@ struct AASystem {
 			res=r;
 		}
 
+		string toString () {
+			return to!string(scalars)~to!string(res);
+		}
+
 		@property bool singleVariable() {return scalars.length == 1;}
 
 		@property char[] vars() {
 			return scalars.keys;
 		}
 
-		bool hasVariables(char[] vars) {
-			foreach (v;vars)
-				if (!hasVariable(v))
-					return false;
-			return true;
-		}
-
-		bool hasVariable(char var) {
-			foreach(v;scalars.byKey) {
-				if (var == v) 
-					return true;
-			}
-			return false;
-		}
-		
 		AARow opBinary (string op)(double val) if (op=="*"||op=="/") {
 			AARow ret;
 			foreach (k,v;scalars) {
@@ -46,26 +42,26 @@ struct AASystem {
 			return ret;
 		}
 
-		AARow opBinary (string op)(AARow rhs) if ((op=="+"||op=="-")&& rhs !is this) {
-			AARow ret = new AARow(this);
+		AARow opBinary (string op)(AARow rhs) if ((op=="+"||op=="-")) {
+			AARow ret = AARow(this.scalars,this.res);
 			foreach (var;rhs.scalars.keys) {
-				mixin (q{ret[var] }~op~q{= rhs[var]});  
+				mixin (q{ret[var] }~op~q{= rhs[var];});  
 			}
-			mixin (q{ret.res }~op~q{= rhs.res});
+			mixin (q{ret.res }~op~q{= rhs.res;});
 			return ret;
 		}
 
-//		AARow applyTo (char op,AARow r) {
-//			enum OPS = ['+','-'];
-//			AARow ar = this;
-//			if (r!is this) {
-//				foreach(var;r.scalars.keys) {
-//					mixin(ForOps!("ar.scalars[var] ","= r.scalars[var]")(OPS));
-//				}
-//				mixin (ForOps!("ar.res ","= r.res")(OPS));
-//			}
-//			return ar;
-//		}
+		//		AARow applyTo (char op,AARow r) {
+		//			enum OPS = ['+','-'];
+		//			AARow ar = this;
+		//			if (r!is this) {
+		//				foreach(var;r.scalars.keys) {
+		//					mixin(ForOps!("ar.scalars[var] ","= r.scalars[var]")(OPS));
+		//				}
+		//				mixin (ForOps!("ar.res ","= r.res")(OPS));
+		//			}
+		//			return ar;
+		//		}
 
 		//		void removeZeroScalars() {
 		//			foreach (key;scalars.keys)
@@ -75,45 +71,54 @@ struct AASystem {
 	}
 	
 	AARow[] rows;
-	double[char] kwnvars; 
 
-	AARow[] getSingleVariableRows() {
-		AARow[] res;
-		foreach (ref r;rows) {
-			if (r.singleVariable) {
-				res ~= r;
+	@property char[] vars() {
+		char[] vars;
+		foreach (r;this.rows) {
+			foreach (v;r.vars) {
+				if (vars.find(v) ==[])
+					vars~= v;
 			}
 		}
-		return res;
+		return vars;
 	}
 
-	/*
-	AASystem opBinary(string op) (char op,double val) {
-		AARow[] aars;
-		foreach (r;rows) {
-			aars ~=   r.applyTo(op,val);
-		}
-		return AASystem(aars);
-	}*/
-
-	
-
-	this (AARow[] rs) {
-		rows = rs;
-	}
-
-	string toString() {
-		char[] vstring;
-		foreach (r;rows) {
-			foreach (i;0 .. r.scalars.length) {
-				if (r.scalars.values[i]>0 && i!=0) vstring ~= '+';
-				if (r.scalars.values[i]!=1) vstring ~= to!string(r.scalars.values[i]);
-				vstring ~= r.scalars.keys[i];
+		AARow[] getSingleVariableRows() {
+			AARow[] res;
+			foreach (ref r;rows) {
+				if (r.singleVariable) {
+					res ~= r;
+				}
 			}
-			vstring ~= "=" ~ to!string(r.res) ~ "\n";
+			return res;
 		}
-		vstring ~= "KownVars :" ~ to!string(kwnvars); 
-		return cast(string)vstring;
-	}
 
-}
+		/*
+		 AASystem opBinary(string op) (char op,double val) {
+		 AARow[] aars;
+		 foreach (r;rows) {
+		 aars ~=   r.applyTo(op,val);
+		 }
+		 return AASystem(aars);
+		 }*/
+
+		
+
+		this (AARow[] rs) {
+			rows = rs;
+		}
+
+		string toString() {
+			char[] vstring;
+			foreach (r;rows) {
+				foreach (i;0 .. r.scalars.length) {
+					if (r.scalars.values[i]>0 && i!=0) vstring ~= '+';
+					if (r.scalars.values[i]!=1) vstring ~= to!string(r.scalars.values[i]);
+					vstring ~= r.scalars.keys[i];
+				}
+				vstring ~= "=" ~ to!string(r.res) ~ "\n";
+			}
+			return cast(string)vstring;
+		}
+
+	}

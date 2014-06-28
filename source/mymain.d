@@ -13,25 +13,35 @@ void main(string[] args) {
 	if (line=="") break;
 	_sys ~= line.dup;
 	}
-	
-
 	auto testSystem = getAASystem(_sys);
-	
+
+
 	writeln("Initial System :");
 	writeln(testSystem);
-	writeln("GCD applyed:");
-	writeln(testSystem.applyGCD);
-	writeln("LCM applyed");
-	writeln(testSystem.applyLCM);
-	//writeln("Kown Variable Reduction (includes reduceSingle):");
-	//testSystem.eliminateKnownVariables.writeln;
-	//writeln("After row reduction");
+	writeln("after solving");
+	double[char] varstore;
+	bool goon = true;
 
-	//	testSystem.rowReducedSystem.writeln;
-	//	testSystem.rows[1] = testSystem.rows[1].applyTo('/',testSystem.rows[1].scalars.values[0]/testSystem.rows[2].scalars.values[0]);
-	//	testSystem.rows[1] = testSystem.rows[1].applyTo('-',testSystem.rows[2]);
-	//	testSystem.reduceSingles;
-	//	testSystem.reduceKownVariables;
-	//	testSystem.reduceSingles;
-	//	writeln(testSystem);
+	while (goon) {
+		writeln ("still sloving");
+		writeln (varstore);
+		uint[] rowstoremove;
+		foreach (i;rowstoremove) testSystem.rows.remove(i);
+
+		foreach (uint i,ref row;testSystem.rows) {
+			if (row.singleVariable) {
+				row.eliminateSingels(varstore);
+				rowstoremove~=i;
+			} else {
+				row = row.eliminateKnownVariables(varstore);
+			}
+
+			if (i != testSystem.rows.length-1) {
+				auto r2 = testSystem.rows[i+1]; 
+			row = eliminateRowVar(row,r2);
+			}
+		}
+		if (varstore.length == testSystem.vars.length) goon = false;
+	}
+	writeln(testSystem);
 }

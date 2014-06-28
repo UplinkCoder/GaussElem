@@ -19,7 +19,8 @@ private AASystem.AARow parseRow (ParseTree Input) {
 	double scalar;
 	double res;
 	foreach (ref child;Input.children[0].children) {
-		if (child.name=="GaussGrammar.LeftSideElement") {
+		if (child.name=="GaussGrammar.RowOp") {}
+		else if (child.name=="GaussGrammar.LeftSideElement") {
 			if (child.matches.length == 2)
 				scalar = to!double(child.matches[0]), chr = to!char(child.matches[1]);
 			else if (child.matches.length == 1 && child.matches[0][0] != '-') 

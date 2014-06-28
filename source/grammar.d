@@ -17,7 +17,7 @@ immutable string GGstring =
 	
     Minus     <- '-'     
     
-    Number <~ :'('? Minus? ~Digit+ :')'? 
+    Number <~ :'('? Minus? ~Digit+ '.'? ~Digit+ :')'? 
     Digit   <- [0-9]
     Letter <- [a-z]
 ";
