@@ -57,7 +57,6 @@ AARow eliminateSingels(AARow row,ref double[char] kwnvars) {
 				auto ev = row.vars[0];
 				if (row.scalars.keys[0] in kwnvars) {
 					assert(0,"something is wrong");
-					break;
 				}
 				assert( (row/row[ev])[ev] == 1, "something is very wrong");
 				kwnvars[ev] = (row/row[ev]).res;  // 7a=14  | /7; a=2 | knwvars[a] = 2
