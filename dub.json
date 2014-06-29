@@ -1,0 +1,9 @@
+{
+	"name": "gausselem",
+	"targetType": "executable",
+	"description": "An Implementation of Gaussian Elemination for educativ purposes",
+	"copyright": "Copyright © 2014, Stefan Koch",
+	"authors": ["Uplink_Coder"],
+	"dependencies": {
+	}
+}

@@ -9,7 +9,7 @@ struct Fraction
 	Fraction opBinary(string op)(int rhs)
 	{
 		static if (op=="*") {
-			return Fraction(z*rhs,n*rhs);
+			return Fraction(z*rhs,n);
 		}
 	}
 	// b1=(7/28) b2=(7/14)  b1/gcd =(1/3)*2 b2/gcd(1/2)*3 (2/6)+(3/6) (1 n2/gcd = 2 || b2

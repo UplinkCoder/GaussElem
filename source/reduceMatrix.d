@@ -80,23 +80,22 @@ AARow eliminateSingels(AARow row,ref double[char] kwnvars) {
 // now we can try to reduce even more by subtracting rows form each other
 AARow eliminateRowVar(AARow r1,AARow r2) {
 	writefln("looking for intersctions in row %s and %s",r1,r2);
-	auto intr= setIntersection(r1.vars,r2.vars);
-	writeln(intr);
-	foreach (_v;intr){
-		auto v = cast(char)_v;
-		writeln(v,":",r1[v],",",r2[v]," divby: ",reduce!gcd(r1[v],r2));
-		auto scl = r1[v];
-		auto rx = r2.divByGCD(scl);
-			r1 = r1-r2;
-			if (r1[v].approxEqual(0)) {
-			r1.scalars.remove(v);
-			if (r2[v].approxEqual(0))
-				r2.scalars.remove(v);
-			r1.writeln;
-			break;
+	auto intr= setIntersection(r1.vars,r2.vars).array;
+		if(intr) {
+		char v = cast(char)intr[0];
+		auto scl1 = lcm(r1[v],r2[v])/r1[v];
+		auto scl2 = lcm(r1[v],r2[v])/r2[v];
+		r1 = r1*scl1-r2*scl2;
+		foreach(k,v;r1) {
+			if(v.approxEqual(0)) r1.scalars.remove(k);
 		}
-		writeln("done with ",v);
 	}
-		return r1;
-	}
-	
+	return r1;
+}
+unittest {
+	auto r1 = AARow(['a':2,'b':4],16);
+	auto r2 = AARow(['a':-2,'b':2],16);
+
+	auto res = eliminateRowVar(r1,r2);
+	//assert(res == AARow['b':)
+}

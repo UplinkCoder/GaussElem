@@ -2,7 +2,7 @@ import std.algorithm;
 import std.array;
 import std.conv:to;
 import std.stdio;
-import forops;
+
 struct AASystem {
 
 	struct AARow {
